@@ -52,6 +52,9 @@ const PLANETS = {
 const planetsByType = {
   sun: 'luminary',
   moon: 'luminary',
+  earth: 'luminary',
+  north_node: 'luminary',
+  south_node: 'luminary',
   mercury: 'personal',
   venus: 'personal',
   mars: 'personal',

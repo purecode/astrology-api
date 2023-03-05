@@ -7,6 +7,8 @@ sweph.set_ephe_path(path.join(__dirname, '/../../eph'))
 const {
   SE_SUN,
   SE_MOON,
+  SE_EARTH,
+  SE_TRUE_NODE,
   SE_MEAN_APOG,
   SE_MERCURY,
   SE_VENUS,
@@ -27,6 +29,9 @@ const {
 
 const PLANETS = {
   sun: SE_SUN,
+  earth: SE_SUN,
+  north_node: SE_TRUE_NODE,
+  south_node: SE_TRUE_NODE,
   moon: SE_MOON,
   mercury: SE_MERCURY,
   venus: SE_VENUS,

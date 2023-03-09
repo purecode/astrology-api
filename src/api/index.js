@@ -63,42 +63,60 @@ router.get('/dateByPlanetPosition', async (req, res) => {
   })
 })
 
-router.get('/dateByPlanetPositionRange', async (req, res) => {
-  const planet = req.query.planet
-  const needle = parseFloat(req.query.lng)
-  const fromDate = new Date(req.query.from)
-  const toDate = new Date(req.query.to)
+const find = (planet, needle, fromDate, toDate, firstOnly) => {
+  const date = new Date(fromDate.valueOf())
 
   const getPos = (date) => {
     return astros.position(planet, date).position.longitude
   }
 
-  const date = new Date(fromDate.valueOf())
-  let found = []
+  const found = []
 
   let cur = getPos(date)
   while (date.getTime() < toDate.getTime()) {
     cur = getPos(date)
-    if (cur > needle) {
-      date.setDate(date.getDate() + 1)
-      continue
-    }
 
     while (cur < needle) {
+      if (date.getTime() > toDate.getTime()) {
+        return found
+      }
+
       if (needle - cur > 1) {
         date.setDate(date.getDate() + 1)
       } else if (needle - cur > 0.01) {
         date.setMinutes(date.getMinutes() + 1)
       } else {
+        // console.log(date)
         date.setSeconds(date.getSeconds() + 1)
       }
       cur = getPos(date)
+      if (found.length > 100) { return found }
     }
-    found.push(date.toISOString())
+
+    if (Math.abs(cur - needle) <= 0.01) {
+      found.push(date.toISOString())
+      if (firstOnly) {
+        return found
+      }
+      // break
+    }
+
     date.setDate(date.getDate() + 1)
   }
 
-  found = found.map((date) => {
+  date.setDate(date.getDate() + 1)
+
+  return found
+}
+
+router.get('/dateByPlanetPositionRange', async (req, res) => {
+  const planet = req.query.planet
+  const needle = parseFloat(req.query.lng)
+  const fromDate = new Date(req.query.from)
+  const toDate = new Date(req.query.to)
+  const single = req.query.single !== undefined
+
+  const found = find(planet, needle, fromDate, toDate, single).map((date) => {
     const pos = astros.position(planet, new Date(date))
     return ({ pos: pos.position.longitude, date, retrograde: pos.retrograde })
   })
@@ -108,7 +126,7 @@ router.get('/dateByPlanetPositionRange', async (req, res) => {
     fromDate,
     toDate,
     longitude: needle,
-    found
+    found: single ? found[0] : found
   })
 })
 

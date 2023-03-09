@@ -73,7 +73,7 @@ router.get('/dateByPlanetPositionRange', async (req, res) => {
     return astros.position(planet, date).position.longitude
   }
 
-  const date = fromDate
+  const date = new Date(fromDate.valueOf())
   let found = []
 
   let cur = getPos(date)

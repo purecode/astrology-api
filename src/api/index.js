@@ -63,16 +63,19 @@ router.get('/dateByPlanetPosition', async (req, res) => {
   })
 })
 
+// const plantesPrecies = { sun: 0.01, moon: 0.01 }
+
 const find = (planet, needle, fromDate, toDate, firstOnly) => {
-  const date = new Date(fromDate.valueOf())
+  let date = new Date(fromDate.valueOf())
 
   const getPos = (date) => {
     return astros.position(planet, date).position.longitude
   }
-
   const found = []
 
   let cur = getPos(date)
+  const pres = 0.01
+
   while (date.getTime() < toDate.getTime()) {
     cur = getPos(date)
 
@@ -80,20 +83,18 @@ const find = (planet, needle, fromDate, toDate, firstOnly) => {
       if (date.getTime() > toDate.getTime()) {
         return found
       }
-
       if (needle - cur > 1) {
-        date.setDate(date.getDate() + 1)
+        date = new Date(date.getTime() + 1000 * 60 * 24)
       } else if (needle - cur > 0.01) {
-        date.setMinutes(date.getMinutes() + 1)
+        date = new Date(date.getTime() + 1000 * 60)
       } else {
-        // console.log(date)
-        date.setSeconds(date.getSeconds() + 1)
+        date = new Date(date.getTime() + 1000)
       }
       cur = getPos(date)
       if (found.length > 100) { return found }
     }
 
-    if (Math.abs(cur - needle) <= 0.01) {
+    if (Math.abs(cur - needle) <= pres) {
       found.push(date.toISOString())
       if (firstOnly) {
         return found

@@ -11,10 +11,10 @@ jobs:
     runs-on: pokoinikrws
 
     steps:
-    - name: Clone repo
-      uses: actions/checkout@master
-      with:
-        repository: purecode/astrology-api
+    #- name: Clone repo
+    #  uses: actions/checkout@master
+    #  with:
+    #    repository: purecode/astrology-api
 
     - name: Copy repo to target dir
       run: rsync -r /srv/actions-runner/_work/astrology-api/astrology-api/ /srv/astrology-api
@@ -25,6 +25,5 @@ jobs:
     - name: Fix permissions
       run: chown -R astrology-api:astrology-api /srv/astrology-api
 
-    #- name: Restart service
-    #  run: systemctl restart astrology-api
-
+    - name: Restart service
+      run: systemctl restart astrology-api

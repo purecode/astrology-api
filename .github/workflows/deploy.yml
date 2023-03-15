@@ -11,13 +11,13 @@ jobs:
     runs-on: pokoinikrws
 
     steps:
-    #- name: Clone repo
-    #  uses: actions/checkout@master
-    #  with:
-    #    repository: purecode/astrology-api
+    - name: Clone repo
+      uses: actions/checkout@master
+      with:
+        repository: purecode/astrology-api
 
     - name: Copy repo to target dir
-      run: rsync -r /srv/actions-runner/_work/astrology-api/astrology-api/ /srv/astrology-api
+      run: rsync -r --delete /srv/actions-runner/_work/astrology-api/astrology-api/ /srv/astrology-api
 
     - name: Install dependencies
       run: cd /srv/astrology-api/ && npm install

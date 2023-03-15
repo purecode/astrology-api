@@ -16,8 +16,14 @@ jobs:
       with:
         repository: purecode/astrology-api
 
-    #- name: Install dependencies
-    #  run: cd /srv/astrology-api/ && npm install
+    - name: Copy repo to target dir
+      run: rsync -r /srv/actions-runner/_work/astrology-api/astrology-api/ /srv/astrology-api
+
+    - name: Install dependencies
+      run: cd /srv/astrology-api/ && npm install
+
+    - name: Fix permissions
+      run: chown -R astrology-api:astrology-api /srv/astrology-api
 
     #- name: Restart service
     #  run: systemctl restart astrology-api

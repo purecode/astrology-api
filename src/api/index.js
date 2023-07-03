@@ -71,7 +71,31 @@ const find = (planet, needle, fromDate, toDate, firstOnly) => {
   const getPos = (date) => {
     return astros.position(planet, date).position.longitude
   }
+
+  const fr = getPos(fromDate)
+  const to = getPos(toDate)
+
+  let retro = fr > to
+  if (fr > 180 && to < 180) {
+    retro = false
+  } else if (fr < 180 && to > 180) {
+    retro = true
+  }
   const found = []
+
+  const valid = (cur, end, retro) => {
+    if (cur > 180 && end < 180) {
+      return cur < 360 || (cur > 0 && cur < end)
+    } else if (cur < 180 && end > 180) {
+      return cur > 0 || (cur < 360 && cur > end)
+    } else {
+      if (!retro) {
+        return cur < end
+      } else {
+        return cur > end
+      }
+    }
+  }
 
   let cur = getPos(date)
   const pres = 0.01
@@ -79,7 +103,7 @@ const find = (planet, needle, fromDate, toDate, firstOnly) => {
   while (date.getTime() < toDate.getTime()) {
     cur = getPos(date)
 
-    while (cur < needle) {
+    while (valid(cur, needle, retro)) {
       if (date.getTime() > toDate.getTime()) {
         return found
       }

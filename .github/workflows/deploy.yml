@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    runs-on: pokoinikrws
+
+    steps:
+    - name: Clone repo
+      uses: actions/checkout@master
+      with:
+        repository: purecode/astrology-api
+
+    - name: Copy repo to target dir
+      run: rsync -r --delete /srv/actions-runner/_work/astrology-api/astrology-api/ /srv/astrology-api
+
+    - name: Install dependencies
+      run: cd /srv/astrology-api/ && npm install
+
+    - name: Fix permissions
+      run: chown -R astrology-api:astrology-api /srv/astrology-api
+
+    - name: Restart service
+      run: systemctl restart astrology-api

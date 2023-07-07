@@ -84,17 +84,7 @@ const find = (planet, needle, fromDate, toDate, firstOnly) => {
   const found = []
 
   const valid = (cur, end, retro) => {
-    if (cur > 180 && end < 180) {
-      return cur < 360 || (cur > 0 && cur < end)
-    } else if (cur < 180 && end > 180) {
-      return cur > 0 || (cur < 360 && cur > end)
-    } else {
-      if (!retro) {
-        return cur < end
-      } else {
-        return cur > end
-      }
-    }
+    return Math.abs(cur - end) > 0.0001
   }
 
   let cur = getPos(date)

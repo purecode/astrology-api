@@ -7,7 +7,11 @@ router.get('/', async (req, res) => res.status(200).json({ message: 'Welcome to 
 
 router.get('/horoscope', async (req, res) => {
   const date = new Date(req.query.time)
-  const { latitude, longitude, houseSystem } = req.query
+  const {
+    latitude,
+    longitude,
+    houseSystem
+  } = req.query
 
   const chart = astrologer.natalChart(date, latitude, longitude, houseSystem)
 
@@ -63,8 +67,6 @@ router.get('/dateByPlanetPosition', async (req, res) => {
   })
 })
 
-// const plantesPrecies = { sun: 0.01, moon: 0.01 }
-
 const find = (planet, needle, fromDate, toDate, firstOnly) => {
   let date = new Date(fromDate.valueOf())
 
@@ -83,29 +85,65 @@ const find = (planet, needle, fromDate, toDate, firstOnly) => {
   }
   const found = []
 
-  const valid = (cur, end, retro) => {
-    return Math.abs(cur - end) > 0.0001
+  const valid = (cur, end, planet) => {
+    if (planet === 'moon') {
+      return Math.abs(cur - end) >= 0.0001
+    } else {
+      return Math.abs(cur - end) >= 0.0001
+    }
+  }
+
+  const delta = (needle, cur) => {
+    if (needle > 235 && cur < 45) {
+      return 360 - needle + cur
+    } else if (needle < 45 && cur > 235) {
+      return 360 - cur + needle
+    } else {
+      return Math.abs(needle - cur)
+    }
   }
 
   let cur = getPos(date)
   const pres = 0.01
 
+  // console.log("CUR: " + cur + "; NEEDLE: " + needle)
+
   while (date.getTime() < toDate.getTime()) {
     cur = getPos(date)
 
-    while (valid(cur, needle, retro)) {
+    while (valid(cur, needle, planet)) {
       if (date.getTime() > toDate.getTime()) {
         return found
       }
-      if (needle - cur > 1) {
-        date = new Date(date.getTime() + 1000 * 60 * 24)
-      } else if (needle - cur > 0.01) {
-        date = new Date(date.getTime() + 1000 * 60)
+
+      if (delta(needle, cur) > 1) {
+        if (planet === 'moon') {
+          // К луне нужно аккуратно подходить, она быстрая.
+          date = new Date(date.getTime() + 1000 * 60 * 12)
+        } else {
+          date = new Date(date.getTime() + 1000 * 60 * 24)
+        }
+
+        // console.log("1: planet  = " + planet +", cur = " + cur + ", needle = " + needle + " delta(needle-cur) = " + delta(needle, cur) + " date " + date.toISOString() )
+      } else if (delta(needle, cur) > 0.01) {
+        if (planet === 'moon') { // К луне нужно аккуратно подходить, она быстрая.
+          date = new Date(date.getTime() + 1000 * 30)
+        } else {
+          date = new Date(date.getTime() + 1000 * 60)
+        }
+
+        // console.log("2: planet  = " + planet +", cur = " + cur + ", needle = " + needle + " delta(needle-cur) = " + delta(needle, cur) + " date " + date.toISOString() )
       } else {
         date = new Date(date.getTime() + 1000)
+
+        // console.log("3: planet  = " + planet +", cur = " + cur + ", needle = " + needle + " delta(needle-cur) = " + delta(needle, cur) + " date " + date.toISOString() )
       }
+
       cur = getPos(date)
-      if (found.length > 100) { return found }
+
+      if (found.length > 100) {
+        return found
+      }
     }
 
     if (Math.abs(cur - needle) <= pres) {
@@ -133,7 +171,11 @@ router.get('/dateByPlanetPositionRange', async (req, res) => {
 
   const found = find(planet, needle, fromDate, toDate, single).map((date) => {
     const pos = astros.position(planet, new Date(date))
-    return ({ pos: pos.position.longitude, date, retrograde: pos.retrograde })
+    return ({
+      pos: pos.position.longitude,
+      date,
+      retrograde: pos.retrograde
+    })
   })
 
   res.status(200).json({

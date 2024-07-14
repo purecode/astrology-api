@@ -23,6 +23,7 @@ const {
   SE_CHIRON,
   SE_CERES,
   SE_PALLAS,
+  SE_WHITE_MOON,
   SEFLG_SWIEPH,
   SEFLG_SPEED
 } = sweph.constants
@@ -46,6 +47,7 @@ const PLANETS = {
   ceres: SE_CERES,
   vesta: SE_VESTA,
   pallas: SE_PALLAS,
+  selene: SE_WHITE_MOON,
   juno: SE_JUNO
 }
 
@@ -68,6 +70,7 @@ const planetsByType = {
   ceres: 'other',
   vesta: 'other',
   pallas: 'other',
+  selene: 'other',
   juno: 'other'
 }
 

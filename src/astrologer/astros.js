@@ -70,7 +70,7 @@ const planetsByType = {
   ceres: 'other',
   vesta: 'other',
   pallas: 'other',
-  selene: 'other',
+  selene: 'luminary',
   juno: 'other'
 }
 

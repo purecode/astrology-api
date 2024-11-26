@@ -21,7 +21,37 @@ router.get('/horoscope', async (req, res) => {
 })
 
 const astros = require('../astrologer/astros')
+const { houses } = require('../astrologer/houses')
 
+/**
+ * @param {string} req.query.lat - The latitude coordinate (required).
+ * @param {number} req.query.lng - The longitude coordinate (required).
+ * @param {number} req.query.date - The date (required).
+ */
+router.get('/houses', async (req, res) => {
+  if (!req.query.lat || !req.query.lng || !req.query.date) {
+    res.status(400).json({
+      error: 'Не переданы параметры date, lat и lng'
+    })
+    return
+  }
+
+  const date = new Date(req.query.date)
+  const a = houses(date, {
+    latitude: +req.query.lat,
+    longitude: +req.query.lng
+  })
+
+  res.status(200).json({
+    data: a
+  })
+})
+
+/**
+ * @param {string} req.query.planet - The planet (required).
+ * @param {number} req.query.lng - The longitude coordinate (required).
+ * @param {number} req.query.date - The date (required).
+ */
 router.get('/dateByPlanetPosition', async (req, res) => {
   const planet = req.query.planet
   const needle = parseFloat(req.query.lng)
